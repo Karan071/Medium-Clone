@@ -10,7 +10,7 @@ const app = new Hono<{
 }>();
 // app.use("/*", cors());
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
+  origin: 'https://medium-clone-877955m3x-karan-s-projects-b708c7ea.vercel.app/', // Your frontend URL
   credentials: true
 }));
 
