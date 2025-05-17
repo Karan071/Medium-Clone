@@ -15,7 +15,7 @@ export default function BlogPage({ blog }: { blog: Blog }) {
                         <div className="text-slate-500 pt-3">
                             Post on {"2nd Dec, 2024"}
                         </div>
-                        <div className="pt-5 text-lg leading-tight font-medium">
+                        <div className="pt-5 text-xl font-medium ">
                             {blog.content}
                         </div>
                     </div>
@@ -42,3 +42,4 @@ export default function BlogPage({ blog }: { blog: Blog }) {
         </div>
     )
 }
+

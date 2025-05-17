@@ -39,42 +39,6 @@ export const useBlog = ({ id }: { id: string }) => {
 };
 
 
-// // copy of the code
-// export function useBlog2({ id }: { id: string }) {
-//     const [loading, setLoading] = useState(true);
-//     const [blog, setBlog] = useState<Blog>();
-
-//     useEffect(() => {
-//         let isMounted = true; 
-
-//         const fetchBlog = async () => {
-//             try {
-//                 const response = await axios.get(`/api/v1/blog/${id}`, {
-//                     headers : {
-//                         Authorization : localStorage.getItem("token")
-//                     }
-//                 });
-//                 if (isMounted) {  // Only update state if component is still mounted
-//                     setBlog(response.data.blog);
-//                     setLoading(false);
-//                 }
-//             } catch (error) {
-//                 if (isMounted) {
-//                     setLoading(false);
-//                 }
-//             }
-//         };
-
-//         fetchBlog();
-
-//         return () => {
-//             isMounted = false;  // Cleanup function
-//         };
-//     }, [id]);
-
-//     return { loading, blog };
-// }
-
 
 export const useBlogs = (): { loading: boolean; blogs: any[] } => {
     const [loading, setLoading] = useState(true);
@@ -98,3 +62,22 @@ export const useBlogs = (): { loading: boolean; blogs: any[] } => {
         blogs
     }
 }
+
+export const useAvatarName = () => {
+    const [name, setName] = useState("");
+    useEffect(()=> {
+        axios.get(`${BACKEND_URL}/api/v1/user/name`, {
+            headers : {
+                Authorization: localStorage.getItem("token")
+            }
+        }).then(response => {
+            setName(response.data.name || "User");
+        }).catch(error => {
+            console.error("Error fetching user name:", error);
+            setName("User");
+        })
+    },[])
+    return{
+        name
+    }
+};

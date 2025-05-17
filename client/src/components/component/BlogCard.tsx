@@ -34,7 +34,7 @@ export default function BlogCard({
                     </div>
                 </div>
             </div>
-            <div className="font-bold text-3xl mt-4">
+            <div className="font-extrabold text-3xl mt-4">
                 {title}
             </div>
             <div className="font-normal text-xl text-slate-500 mt-3">

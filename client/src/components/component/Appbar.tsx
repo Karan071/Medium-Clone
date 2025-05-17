@@ -1,10 +1,11 @@
 import appLogo from "@/assets/lightMode.png";
-// import { Bell, Ellipsis } from "lucide-react";
 import { Avatar } from "./BlogCard";
 import { Link } from "react-router-dom";
 import { CirclePlus, Search } from "lucide-react";
+import { useAvatarName } from "@/hooks";
 
 export default function Appbar() {
+    const { name } = useAvatarName();
     return (
         <div className="border-b flex justify-between px-30 font-inter">
             <div className="flex justify-center items-center gap-4 cursor-pointer">
@@ -28,15 +29,9 @@ export default function Appbar() {
                         <CirclePlus size={30} className="text-slate-500" />
                     </button>
                 </Link>
-                <Avatar name="Karan" size={8}/>
+                <Avatar name={name} size={8} />
             </div>
         </div>
     )
 }
 
-
-{/* <button className="bg-green-600 rounded-4xl px-5 py-1.5 text-white">
-    Publish
-</button>
-<Ellipsis className="text-slate-600" />
-<Bell className="text-slate-600" /> */}

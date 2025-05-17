@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge"
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { sign } from 'hono/jwt';
+import { sign, verify } from 'hono/jwt';
 import { signUpSchema, signInSchema } from "../schemas"
 
 
@@ -91,4 +91,39 @@ userRouter.post("/signin", async (c) => {
     }
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
     return c.json({ jwt })
-})
+});
+
+userRouter.get("/name", async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+    
+    // Get user ID from JWT token
+    const token = c.req.header('Authorization');
+    if (!token) {
+        c.status(401);
+        return c.json({ message: "Authorization token is required" });
+    }
+
+    try {
+        const { id } = await verify(token, c.env.JWT_SECRET) as { id: string };
+        const user = await prisma.user.findUnique({
+            where: {
+                id
+            },
+            select: {
+                name: true
+            }
+        });
+
+        if (!user) {
+            c.status(404);
+            return c.json({ message: "User not found" });
+        }
+
+        return c.json({ name: user.name });
+    } catch (error) {
+        c.status(401);
+        return c.json({ message: "Invalid or expired token" });
+    }
+});
