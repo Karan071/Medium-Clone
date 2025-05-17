@@ -1,10 +1,12 @@
 {
   "name": "@karan071/medium-schemas",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "This is a common module created for passing the zod schemas",
   "main": "dist/schemas.js",
+  "types": "dist/schemas.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -b",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",

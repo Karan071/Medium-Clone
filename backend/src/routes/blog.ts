@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { verify } from "hono/jwt";
+import { blogSchema, updateblogSchema } from "../schemas"
 
-export const blogRouter = new Hono<{
+export const  blogRouter = new Hono<{
     Bindings: {
         DATABASE_URL: string;
         JWT_SECRET: string;
@@ -13,24 +14,39 @@ export const blogRouter = new Hono<{
 }>();
 
 //Middleware
-blogRouter.use("/*", async(c, next) => {
+blogRouter.use("/*", async (c, next) => {
     //extracts the user id
     //pass it down to route handler
     const authHeader = c.req.header("authorization") || "";
-    const user = await verify(authHeader, c.env.JWT_SECRET);
-    if(user){
-        c.set("userId", user.id);
-        await next();
-    }else{
+    try {
+        const user = await verify(authHeader, c.env.JWT_SECRET);
+        if (user) {
+            //@ts-ignore
+            c.set("userId", user.id);
+            await next();
+        } else {
+            c.status(403);
+            return c.json({
+                message: "User not logged in"
+            })
+        }
+    } catch (error) {
         c.status(403);
         return c.json({
-            message : "User not logged in"
+            message: "You are not loged in"
         })
     }
 })
 
 blogRouter.post("/", async (c) => {
     const body = await c.req.json();
+    const { success } = blogSchema.safeParse(body);
+    if (!success) {
+        c.status(403);
+        return c.json({
+            message: "Wrong inputs for Blog"
+        })
+    }
     const authorId = c.get("userId")
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
@@ -50,6 +66,13 @@ blogRouter.post("/", async (c) => {
 
 blogRouter.put("/", async (c) => {
     const body = await c.req.json();
+    const { success } = updateblogSchema.safeParse(body);
+    if(!success) {
+        c.status(403);
+        return c.json({
+            message : "Inputs are not correct"
+        })
+    }
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate());
@@ -73,10 +96,21 @@ blogRouter.get("/bulk", async (c) => {
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate());
 
-    const allBlogs = await prisma.blog.findMany();
+    const blogs = await prisma.blog.findMany({
+        select: {
+            content: true,
+            title: true,
+            id: true,
+            author: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
 
     return c.json({
-        allBlogs
+        blogs
     })
 })
 
@@ -91,6 +125,15 @@ blogRouter.get("/:id", async (c) => {
         const blog = await prisma.blog.findFirst({
             where: {
                 id: id
+            }, 
+            select: {
+                title: true,
+                content: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         })
         return c.json({
