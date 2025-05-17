@@ -10,10 +10,12 @@ const app = new Hono<{
 }>();
 // app.use("/*", cors());
 app.use(cors({
-  origin: '*', // Allow all origins (for testing)
+  origin: ['https://medium-clone-three-cyan.vercel.app', 'http://localhost:3000'], // Specify allowed origins
   credentials: true,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization']
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
+  maxAge: 600,
 }));
 
 app.route("/api/v1/user", userRouter);
