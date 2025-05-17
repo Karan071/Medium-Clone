@@ -10,8 +10,10 @@ const app = new Hono<{
 }>();
 // app.use("/*", cors());
 app.use(cors({
-  origin: 'https://medium-clone-877955m3x-karan-s-projects-b708c7ea.vercel.app/', // Your frontend URL
-  credentials: true
+  origin: 'https://medium-clone-877955m3x-karan-s-projects-b708c7ea.vercel.app', // Remove trailing slash
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.route("/api/v1/user", userRouter);
